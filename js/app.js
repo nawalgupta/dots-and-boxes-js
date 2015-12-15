@@ -1,11 +1,17 @@
 /*
-	GLOBAL VARIABLES
+	GLOBAL VARIABLES AND OBJECTS
 */
+
+function Point(x, y) {
+	this.X = x;
+	this.Y = y;
+};
 
 CANVAS_ID = "gameCanvas";
 CANVAS = null;
 CONTEXT = null;
 
+GRID = []
 
 /*
 	SETUP FUNCTIONS
@@ -13,6 +19,7 @@ CONTEXT = null;
 
 function initializeGame() {
 	setupCanvas(600, 600);
+	initializePointer();
 };
 
 function setupCanvas(width, height) {
@@ -40,9 +47,14 @@ function drawGrid(distanceBtwPts) {
 	for (var x = 1; x < width - 1; x++) {
 		for (var y = 1; y < height - 1; y++) {
 			if (x % distanceBtwPts == 0 && y % distanceBtwPts == 0) {
+				// draw circle on grid point
 				CONTEXT.beginPath();
-				CONTEXT.arc(x, y, 1, 0, 2 * Math.PI, true);
+				CONTEXT.arc(x, y, 2, 0, 2 * Math.PI, true);
 				CONTEXT.fill();
+
+				//store grid point
+				var point = new Point(x, y);
+				GRID.push(point);
 			};
 		};
 	};
@@ -50,7 +62,24 @@ function drawGrid(distanceBtwPts) {
 
 
 /*
+	GAMEPLAY FUNCTIONS
+*/
+
+function initializePointer() {
+	$("#" + CANVAS_ID).mousemove(function(event) {
+		parsePointer(event);
+	});
+}
+
+function parsePointer(event) {
+	var point = new Point(event.offsetX, event.offsetY);
+}
+
+
+/*
 	DRIVER CODE
 */
 
 initializeGame();
+
+
