@@ -10,11 +10,13 @@ function Point(x, y) {
 CANVAS_ID = "gameCanvas";
 CANVAS = null;
 CONTEXT = null;
+CANVAS_OFFSET = 1;
+
 
 GRID = []
 
 /*
-	SETUP FUNCTIONS
+	SETUP
 */
 
 function initializeGame() {
@@ -34,7 +36,7 @@ function setupCanvas(width, height) {
 
 
 /*
-	DRAWING FUNCTIONS
+	DRAWING
 */
 
 function drawGrid(distanceBtwPts) {
@@ -44,8 +46,8 @@ function drawGrid(distanceBtwPts) {
 	// We want a 1 pixel offset at the start to avoid half-drawn circles
 	// at the edge of the canvas.  The 1 pixel offset at the end is
 	// to keep the board symetric in the canvas.
-	for (var x = 1; x < width - 1; x++) {
-		for (var y = 1; y < height - 1; y++) {
+	for (var x = CANVAS_OFFSET; x < width - CANVAS_OFFSET; x++) {
+		for (var y = CANVAS_OFFSET; y < height - CANVAS_OFFSET; y++) {
 			if (x % distanceBtwPts == 0 && y % distanceBtwPts == 0) {
 				// draw circle on grid point
 				CONTEXT.beginPath();
@@ -62,7 +64,7 @@ function drawGrid(distanceBtwPts) {
 
 
 /*
-	GAMEPLAY FUNCTIONS
+	GAMEPLAY
 */
 
 function initializePointer() {
