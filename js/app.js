@@ -5,6 +5,18 @@
 function Point(x, y) {
 	this.X = x;
 	this.Y = y;
+
+	this.onGrid = function() {
+		for (var i = 0; i < GRID_POINTS.length; i++) {
+			var gridPoint = GRID_POINTS[i];
+
+			if (gridPoint.X === this.X && gridPoint.Y === this.Y) {
+				return true;
+			};
+		};
+
+		return false;
+	};
 };
 
 CANVAS_ID = "gameCanvas";
@@ -62,6 +74,30 @@ function drawGrid() {
 	};
 };
 
+function drawLine(point) {
+	var linePoint1, linePoint2;
+
+	// point is on a vertical line
+	if (point.X % GRID_MULTIPLIER == 0) {
+		linePoint1 = new Point(point.X, point.Y - (point.Y % GRID_MULTIPLIER));
+		linePoint2 = new Point(point.X, linePoint1.Y + GRID_MULTIPLIER);
+	};
+
+	// point is on a horizontal line
+	if (point.Y % GRID_MULTIPLIER == 0) {
+		linePoint1 = new Point(point.X - (point.X % GRID_MULTIPLIER), point.Y);
+		linePoint2 = new Point(linePoint1.X + GRID_MULTIPLIER, point.Y);
+	};
+
+	// check to make sure points exist on the grid and then draw the line
+	if (linePoint1.onGrid() && linePoint2.onGrid()) {
+		CONTEXT.beginPath();
+		CONTEXT.moveTo(linePoint1.X, linePoint1.Y);
+		CONTEXT.lineTo(linePoint2.X, linePoint2.Y);
+		CONTEXT.stroke();
+	};
+};
+
 
 /*
 	GAMEPLAY
@@ -77,7 +113,7 @@ function parsePointer(event) {
 	var point = new Point(event.offsetX, event.offsetY);
 
 	if ( isPointOnGridLine(point) ) {
-		console.log("true", point.X, point.Y);
+		drawLine(point);
 	};
 };
 
