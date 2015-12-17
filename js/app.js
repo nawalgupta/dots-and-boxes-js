@@ -91,6 +91,7 @@ function Line(point1, point2) {
 	this.Point1 = point1;
 	this.Point2 = point2;
 	this.Active = false;
+	this.Highlighted = false;
 
 	this.equalTo = function(line) {
 		if ( (this.Point1.equalTo(line.Point1) && this.Point2.equalTo(line.Point2)) ||
@@ -105,11 +106,28 @@ function Line(point1, point2) {
 		this.Active = true;
 	};
 
+	this.highlightOn = function() {
+		this.Highlighted = true;
+	};
+
+	this.highlightOff = function() {
+		this.Highlighted = false;
+	};
+
 	this.draw = function() {
 		if (this.Active) {
 			CONTEXT.beginPath();
 			CONTEXT.moveTo(this.Point1.X, this.Point1.Y);
 			CONTEXT.lineTo(this.Point2.X, this.Point2.Y);
+			CONTEXT.strokeStyle = "#000000";
+			CONTEXT.stroke();
+		};
+
+		if (this.Highlighted) {
+			CONTEXT.beginPath();
+			CONTEXT.moveTo(this.Point1.X, this.Point1.Y);
+			CONTEXT.lineTo(this.Point2.X, this.Point2.Y);
+			CONTEXT.strokeStyle = "#00BFFF";
 			CONTEXT.stroke();
 		};
 	};
@@ -254,7 +272,7 @@ function drawGrid() {
 	};
 };
 
-function drawLine(point) {
+function highlightLine(point) {
 	var linePoint1, linePoint2;
 
 	// point is on a vertical line
@@ -273,8 +291,8 @@ function drawLine(point) {
 	var line = new Line(linePoint1, linePoint2);
 	var gridLine = getLine(line);
 
-	if (gridLine != null && !gridLine.Active) {
-		gridLine.activate();
+	if (gridLine != null) {
+		gridLine.highlightOn();
 		drawGrid();
 	};
 };
@@ -287,8 +305,8 @@ function drawLine(point) {
 function parsePointer(event) {
 	var point = new Point(event.offsetX, event.offsetY);
 
-	if ( isPointOnGridLine(point) ) {
-		drawLine(point);
+	if (isPointOnGridLine(point)) {
+		highlightLine(point);
 	};
 };
 
