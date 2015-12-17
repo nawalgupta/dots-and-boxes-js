@@ -9,7 +9,7 @@ CANVAS_OFFSET = 1;
 
 GRID_POINTS = []
 GRID_LINES = [];
-GRID_MULTIPLIER = 50; // multiplier that determines where grid points lie
+DISTANCE_BTW_PTS = 50;
 
 
 /*
@@ -31,11 +31,84 @@ function Point(x, y) {
 
 		return false;
 	};
+
+	this.pointAbove = function() {
+		var point = new Point(this.X, this.Y + DISTANCE_BTW_PTS);
+
+		if (point.onGrid()) {
+			return point;
+		} else {
+			return null;
+		}
+	};
+
+	this.pointBelow = function() {
+		var point = new Point(this.X, this.Y - DISTANCE_BTW_PTS);
+
+		if (point.onGrid()) {
+			return point;
+		} else {
+			return null;
+		}
+	};
+
+	this.pointLeft = function() {
+		var point = new Point(this.X - DISTANCE_BTW_PTS, this.Y);
+
+		if (point.onGrid()) {
+			return point;
+		} else {
+			return null;
+		}
+	};
+
+	this.pointRight = function() {
+		var point = new Point(this.X + DISTANCE_BTW_PTS, this.Y);
+
+		if (point.onGrid()) {
+			return point;
+		} else {
+			return null;
+		}
+	};
+
+	this.equalTo = function(point) {
+		if (this.X == point.X && this.Y == point.Y) {
+			return true;
+		};
+
+		return false;
+	};
+
+	this.draw = function() {
+		CONTEXT.beginPath();
+		CONTEXT.arc(this.X, this.Y, 2, 0, 2 * Math.PI, true);
+		CONTEXT.fill();
+	};
 };
 
 function Line(point1, point2) {
 	this.Point1 = point1;
 	this.Point2 = point2;
+	this.Active = true;
+
+	this.equalTo = function(line) {
+		if ( (this.Point1.equalTo(line.Point1) && this.Point2.equalTo(line.Point2)) ||
+				 (this.Point1.equalTo(line.Point2) && this.Point2.equalTo(line.Point1)) ) {
+			return true;
+		};
+
+		return false;
+	};
+
+	this.draw = function() {
+		if (this.Active) {
+			CONTEXT.beginPath();
+			CONTEXT.moveTo(this.Point1.X, this.Point1.Y);
+			CONTEXT.lineTo(this.Point2.X, this.Point2.Y);
+			CONTEXT.stroke();
+		};
+	};
 };
 
 
@@ -46,7 +119,7 @@ function Line(point1, point2) {
 function initializeGame() {
 	setupCanvas(600, 600);
 	generateGridPoints();
-	//generateGridLines();
+	generateGridLines();
 	initializePointer();
 	drawGrid();
 };
@@ -68,9 +141,51 @@ function generateGridPoints() {
 	// to keep the board symetric in the canvas.
 	for (var x = CANVAS_OFFSET; x < width - CANVAS_OFFSET; x++) {
 		for (var y = CANVAS_OFFSET; y < height - CANVAS_OFFSET; y++) {
-			if (x % GRID_MULTIPLIER == 0 && y % GRID_MULTIPLIER == 0) {
-				var point = new Point(x, y);
-				GRID_POINTS.push(point);
+			if (x % DISTANCE_BTW_PTS == 0 && y % DISTANCE_BTW_PTS == 0) {
+				GRID_POINTS.push(new Point(x, y));
+			};
+		};
+	};
+};
+
+function generateGridLines() {
+	for (var i = 0; i < GRID_POINTS.length; i++) {
+		var gridPoint = GRID_POINTS[i];
+
+		var pointAbove = gridPoint.pointAbove();
+		var pointBelow = gridPoint.pointBelow();
+		var pointLeft = gridPoint.pointLeft();
+		var pointRight = gridPoint.pointRight();
+
+		if (pointAbove != null) {
+			var line = new Line(gridPoint, pointAbove);
+
+			if (!doesLineExist(line)) {
+				GRID_LINES.push(line);
+			};
+		};
+
+		if (pointBelow != null) {
+			var line = new Line(gridPoint, pointBelow);
+
+			if (!doesLineExist(line)) {
+				GRID_LINES.push(line);
+			};
+		};
+
+		if (pointLeft != null) {
+			var line = new Line(gridPoint, pointLeft);
+
+			if (!doesLineExist(line)) {
+				GRID_LINES.push(line);
+			};
+		};
+
+		if (pointRight != null) {
+			var line = new Line(gridPoint, pointRight);
+
+			if (!doesLineExist(line)) {
+				GRID_LINES.push(line);
 			};
 		};
 	};
@@ -84,16 +199,41 @@ function initializePointer() {
 
 
 /*
+	HELPERS
+*/
+
+function doesLineExist(line) {
+	for (var i = 0; i < GRID_LINES.length; i++) {
+		var gridLine = GRID_LINES[i];
+
+		if (line.equalTo(gridLine)) {
+			return true;
+		};
+	};
+
+	return false;
+};
+
+
+/*
 	DRAWING
 */
 
-function drawGrid() {
-	for (var i = 0; i < GRID_POINTS.length; i++) {
-		var point = GRID_POINTS[i];
+function clearCanvas() {
+	CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+};
 
-		CONTEXT.beginPath();
-		CONTEXT.arc(point.X, point.Y, 2, 0, 2 * Math.PI, true);
-		CONTEXT.fill();
+function drawGrid() {
+	clearCanvas();
+
+	// draw grid points
+	for (var i = 0; i < GRID_POINTS.length; i++) {
+		GRID_POINTS[i].draw();
+	};
+
+	// draw active lines
+	for (var i = 0; i < GRID_LINES.length; i++) {
+		GRID_LINES[i].draw();
 	};
 };
 
@@ -101,15 +241,15 @@ function drawLine(point) {
 	var linePoint1, linePoint2;
 
 	// point is on a vertical line
-	if (point.X % GRID_MULTIPLIER == 0) {
-		linePoint1 = new Point(point.X, point.Y - (point.Y % GRID_MULTIPLIER));
-		linePoint2 = new Point(point.X, linePoint1.Y + GRID_MULTIPLIER);
+	if (point.X % DISTANCE_BTW_PTS == 0) {
+		linePoint1 = new Point(point.X, point.Y - (point.Y % DISTANCE_BTW_PTS));
+		linePoint2 = new Point(point.X, linePoint1.Y + DISTANCE_BTW_PTS);
 	};
 
 	// point is on a horizontal line
-	if (point.Y % GRID_MULTIPLIER == 0) {
-		linePoint1 = new Point(point.X - (point.X % GRID_MULTIPLIER), point.Y);
-		linePoint2 = new Point(linePoint1.X + GRID_MULTIPLIER, point.Y);
+	if (point.Y % DISTANCE_BTW_PTS == 0) {
+		linePoint1 = new Point(point.X - (point.X % DISTANCE_BTW_PTS), point.Y);
+		linePoint2 = new Point(linePoint1.X + DISTANCE_BTW_PTS, point.Y);
 	};
 
 	// check to make sure points exist on the grid and then draw the line
@@ -130,17 +270,17 @@ function parsePointer(event) {
 	var point = new Point(event.offsetX, event.offsetY);
 
 	if ( isPointOnGridLine(point) ) {
-		drawLine(point);
+		//drawLine(point);
 	};
 };
 
 function isPointOnGridLine(point) {
 	// we do not want points on the grid points
-	if (point.X % GRID_MULTIPLIER == 0 && point.Y % GRID_MULTIPLIER == 0) {
+	if (point.X % DISTANCE_BTW_PTS == 0 && point.Y % DISTANCE_BTW_PTS == 0) {
 		return false;
 	};
 
-	if (point.X % GRID_MULTIPLIER == 0 || point.Y % GRID_MULTIPLIER == 0) {
+	if (point.X % DISTANCE_BTW_PTS == 0 || point.Y % DISTANCE_BTW_PTS == 0) {
 		return true;
 	};
 
