@@ -1,5 +1,19 @@
 /*
-	GLOBAL VARIABLES AND OBJECTS
+	GLOBAL VARIABLES
+*/
+
+CANVAS_ID = "gameCanvas";
+CANVAS = null;
+CONTEXT = null;
+CANVAS_OFFSET = 1;
+
+GRID_POINTS = []
+GRID_LINES = [];
+GRID_MULTIPLIER = 50; // multiplier that determines where grid points lie
+
+
+/*
+	OBJECTS
 */
 
 function Point(x, y) {
@@ -19,13 +33,11 @@ function Point(x, y) {
 	};
 };
 
-CANVAS_ID = "gameCanvas";
-CANVAS = null;
-CONTEXT = null;
-CANVAS_OFFSET = 1;
+function Line(point1, point2) {
+	this.Point1 = point1;
+	this.Point2 = point2;
+};
 
-GRID_POINTS = []
-GRID_MULTIPLIER = 50; // multiplier that determines where grid points lie
 
 /*
 	SETUP
@@ -33,7 +45,10 @@ GRID_MULTIPLIER = 50; // multiplier that determines where grid points lie
 
 function initializeGame() {
 	setupCanvas(600, 600);
+	generateGridPoints();
+	//generateGridLines();
 	initializePointer();
+	drawGrid();
 };
 
 function setupCanvas(width, height) {
@@ -42,16 +57,9 @@ function setupCanvas(width, height) {
 
 	CANVAS = document.getElementById(CANVAS_ID);
 	CONTEXT = CANVAS.getContext("2d");
-
-	drawGrid();
 }
 
-
-/*
-	DRAWING
-*/
-
-function drawGrid() {
+function generateGridPoints() {
 	var width = CONTEXT.canvas.width;
 	var height = CONTEXT.canvas.height;
 
@@ -61,16 +69,31 @@ function drawGrid() {
 	for (var x = CANVAS_OFFSET; x < width - CANVAS_OFFSET; x++) {
 		for (var y = CANVAS_OFFSET; y < height - CANVAS_OFFSET; y++) {
 			if (x % GRID_MULTIPLIER == 0 && y % GRID_MULTIPLIER == 0) {
-				// draw circle on grid point
-				CONTEXT.beginPath();
-				CONTEXT.arc(x, y, 2, 0, 2 * Math.PI, true);
-				CONTEXT.fill();
-
-				//store grid point
 				var point = new Point(x, y);
 				GRID_POINTS.push(point);
 			};
 		};
+	};
+};
+
+function initializePointer() {
+	$("#" + CANVAS_ID).mousemove(function(event) {
+		parsePointer(event);
+	});
+};
+
+
+/*
+	DRAWING
+*/
+
+function drawGrid() {
+	for (var i = 0; i < GRID_POINTS.length; i++) {
+		var point = GRID_POINTS[i];
+
+		CONTEXT.beginPath();
+		CONTEXT.arc(point.X, point.Y, 2, 0, 2 * Math.PI, true);
+		CONTEXT.fill();
 	};
 };
 
@@ -102,12 +125,6 @@ function drawLine(point) {
 /*
 	GAMEPLAY
 */
-
-function initializePointer() {
-	$("#" + CANVAS_ID).mousemove(function(event) {
-		parsePointer(event);
-	});
-};
 
 function parsePointer(event) {
 	var point = new Point(event.offsetX, event.offsetY);
