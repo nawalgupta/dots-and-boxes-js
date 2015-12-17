@@ -105,10 +105,13 @@ function Line(point1, point2) {
 
 	this.activate = function() {
 		this.Active = true;
+		this.Highlighted = false;
 	};
 
 	this.highlightOn = function() {
-		this.Highlighted = true;
+		if (!this.Active) {
+			this.Highlighted = true;
+		};
 	};
 
 	this.highlightOff = function() {
@@ -123,9 +126,7 @@ function Line(point1, point2) {
 			CONTEXT.lineWidth = 3;
 			CONTEXT.strokeStyle = "#000000";
 			CONTEXT.stroke();
-		};
-
-		if (this.Highlighted) {
+		} else if (this.Highlighted) {
 			CONTEXT.beginPath();
 			CONTEXT.moveTo(this.Point1.X, this.Point1.Y);
 			CONTEXT.lineTo(this.Point2.X, this.Point2.Y);
@@ -218,7 +219,11 @@ function generateGridLines() {
 
 function initializePointer() {
 	$("#" + CANVAS_ID).mousemove(function(event) {
-		parsePointer(event);
+		parsePointerMove(event);
+	});
+
+	$("#" + CANVAS_ID).click(function(event) {
+		parsePointerClick(event);
 	});
 };
 
@@ -352,7 +357,7 @@ function resetHighlights() {
 	GAMEPLAY
 */
 
-function parsePointer(event) {
+function parsePointerMove(event) {
 	var point = new Point(event.offsetX, event.offsetY);
 	var nearbyLine = getNearbyLine(point);
 
@@ -361,6 +366,16 @@ function parsePointer(event) {
 		drawGrid();
 	} else {
 		resetHighlights();
+		drawGrid();
+	};
+};
+
+function parsePointerClick(event) {
+	var point = new Point(event.offsetX, event.offsetY);
+	var nearbyLine = getNearbyLine(point);
+
+	if (nearbyLine != null) {
+		nearbyLine.activate();
 		drawGrid();
 	};
 };
