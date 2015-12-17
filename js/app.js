@@ -293,7 +293,12 @@ function highlightLine(point) {
 
 	if (gridLine != null) {
 		gridLine.highlightOn();
-		drawGrid();
+	};
+};
+
+function resetHighlights() {
+	for (var i = 0; i < GRID_LINES.length; i++) {
+		GRID_LINES[i].highlightOff();
 	};
 };
 
@@ -307,6 +312,10 @@ function parsePointer(event) {
 
 	if (isPointOnGridLine(point)) {
 		highlightLine(point);
+		drawGrid();
+	} else {
+		resetHighlights();
+		drawGrid();
 	};
 };
 
