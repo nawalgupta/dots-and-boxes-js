@@ -90,7 +90,7 @@ function Point(x, y) {
 function Line(point1, point2) {
 	this.Point1 = point1;
 	this.Point2 = point2;
-	this.Active = true;
+	this.Active = false;
 
 	this.equalTo = function(line) {
 		if ( (this.Point1.equalTo(line.Point1) && this.Point2.equalTo(line.Point2)) ||
@@ -99,6 +99,10 @@ function Line(point1, point2) {
 		};
 
 		return false;
+	};
+
+	this.activate = function() {
+		this.Active = true;
 	};
 
 	this.draw = function() {
@@ -214,6 +218,19 @@ function doesLineExist(line) {
 	return false;
 };
 
+// gets the line from the GRID_LINES array
+function getLine(line) {
+	for (var i = 0; i < GRID_LINES.length; i++) {
+		var gridLine = GRID_LINES[i];
+
+		if (line.equalTo(gridLine)) {
+			return gridLine;
+		};
+	};
+
+	return null;
+};
+
 
 /*
 	DRAWING
@@ -252,12 +269,13 @@ function drawLine(point) {
 		linePoint2 = new Point(linePoint1.X + DISTANCE_BTW_PTS, point.Y);
 	};
 
-	// check to make sure points exist on the grid and then draw the line
-	if (linePoint1.onGrid() && linePoint2.onGrid()) {
-		CONTEXT.beginPath();
-		CONTEXT.moveTo(linePoint1.X, linePoint1.Y);
-		CONTEXT.lineTo(linePoint2.X, linePoint2.Y);
-		CONTEXT.stroke();
+	// check to make sure line is valid and then activate it
+	var line = new Line(linePoint1, linePoint2);
+	var gridLine = getLine(line);
+
+	if (gridLine != null && !gridLine.Active) {
+		gridLine.activate();
+		drawGrid();
 	};
 };
 
@@ -270,7 +288,7 @@ function parsePointer(event) {
 	var point = new Point(event.offsetX, event.offsetY);
 
 	if ( isPointOnGridLine(point) ) {
-		//drawLine(point);
+		drawLine(point);
 	};
 };
 
