@@ -96,6 +96,7 @@ function Line(point1, point2) {
 	this.equalTo = function(line) {
 		if ( (this.Point1.equalTo(line.Point1) && this.Point2.equalTo(line.Point2)) ||
 				 (this.Point1.equalTo(line.Point2) && this.Point2.equalTo(line.Point1)) ) {
+
 			return true;
 		};
 
@@ -119,6 +120,7 @@ function Line(point1, point2) {
 			CONTEXT.beginPath();
 			CONTEXT.moveTo(this.Point1.X, this.Point1.Y);
 			CONTEXT.lineTo(this.Point2.X, this.Point2.Y);
+			CONTEXT.lineWidth = 3;
 			CONTEXT.strokeStyle = "#000000";
 			CONTEXT.stroke();
 		};
@@ -127,6 +129,7 @@ function Line(point1, point2) {
 			CONTEXT.beginPath();
 			CONTEXT.moveTo(this.Point1.X, this.Point1.Y);
 			CONTEXT.lineTo(this.Point2.X, this.Point2.Y);
+			CONTEXT.lineWidth = 3;
 			CONTEXT.strokeStyle = "#00BFFF";
 			CONTEXT.stroke();
 		};
@@ -237,7 +240,7 @@ function doesLineExist(line) {
 };
 
 // gets the line from the GRID_LINES array
-function getLine(line) {
+function getGridLine(line) {
 	for (var i = 0; i < GRID_LINES.length; i++) {
 		var gridLine = GRID_LINES[i];
 
@@ -247,6 +250,72 @@ function getLine(line) {
 	};
 
 	return null;
+};
+
+// finds the nearest line for a given point if the point is close enough to one
+function getNearbyLine(point) {
+	var buffer = 5;
+	var linePoint1;
+	var linePoint2;
+	var line;
+
+	var distanceToGridLineX = point.X % DISTANCE_BTW_PTS;
+	var distanceToGridLineY = point.Y % DISTANCE_BTW_PTS;
+
+	// we do not want a grid point
+	if (distanceToGridLineX <= buffer && distanceToGridLineY <= buffer) {
+		return null;
+	};
+
+	// directly on a vertical line
+	if (distanceToGridLineX == 0) {
+		linePoint1 = new Point(point.X, point.Y - distanceToGridLineY);
+		linePoint2 = new Point(point.X, linePoint1.Y + DISTANCE_BTW_PTS);
+		line = new Line(linePoint1, linePoint2);
+	};
+
+	// slightly right of vertical line
+	if (distanceToGridLineX <= buffer) {
+		linePoint1 = new Point(point.X - distanceToGridLineX, point.Y - distanceToGridLineY);
+		linePoint2 = new Point(point.X - distanceToGridLineX, linePoint1.Y + DISTANCE_BTW_PTS);
+		line = new Line(linePoint1, linePoint2);
+	};
+
+	// slightly left of vertical line
+	if (DISTANCE_BTW_PTS - distanceToGridLineX <= buffer) {
+		linePoint1 = new Point(point.X + (DISTANCE_BTW_PTS - distanceToGridLineX), point.Y - distanceToGridLineY);
+		linePoint2 = new Point(point.X + (DISTANCE_BTW_PTS - distanceToGridLineX), linePoint1.Y + DISTANCE_BTW_PTS);
+		line = new Line(linePoint1, linePoint2);
+	};
+
+	// directly on a horizontal line
+	if (distanceToGridLineY == 0) {
+		linePoint1 = new Point(point.X - distanceToGridLineX, point.Y);
+		linePoint2 = new Point(linePoint1.X + DISTANCE_BTW_PTS, point.Y);
+		line = new Line(linePoint1, linePoint2);
+	};
+
+	// slightly above a horizontal line
+	if (distanceToGridLineY <= buffer) {
+		linePoint1 = new Point(point.X - distanceToGridLineX, point.Y - distanceToGridLineY);
+		linePoint2 = new Point(linePoint1.X + DISTANCE_BTW_PTS, point.Y - distanceToGridLineY);
+		line = new Line(linePoint1, linePoint2);
+	};
+
+	// slightly below a horizontal line
+	if (DISTANCE_BTW_PTS - distanceToGridLineY <= buffer) {
+		linePoint1 = new Point(point.X - distanceToGridLineX, point.Y + (DISTANCE_BTW_PTS - distanceToGridLineY));
+		linePoint2 = new Point(linePoint1.X + DISTANCE_BTW_PTS, point.Y + (DISTANCE_BTW_PTS - distanceToGridLineY));
+		line = new Line(linePoint1, linePoint2);
+	};
+
+	var gridLine;
+
+	if (line != null) {
+		gridLine = getGridLine(line);
+	}
+
+	return gridLine;
 };
 
 
@@ -272,30 +341,6 @@ function drawGrid() {
 	};
 };
 
-function highlightLine(point) {
-	var linePoint1, linePoint2;
-
-	// point is on a vertical line
-	if (point.X % DISTANCE_BTW_PTS == 0) {
-		linePoint1 = new Point(point.X, point.Y - (point.Y % DISTANCE_BTW_PTS));
-		linePoint2 = new Point(point.X, linePoint1.Y + DISTANCE_BTW_PTS);
-	};
-
-	// point is on a horizontal line
-	if (point.Y % DISTANCE_BTW_PTS == 0) {
-		linePoint1 = new Point(point.X - (point.X % DISTANCE_BTW_PTS), point.Y);
-		linePoint2 = new Point(linePoint1.X + DISTANCE_BTW_PTS, point.Y);
-	};
-
-	// check to make sure line is valid and then activate it
-	var line = new Line(linePoint1, linePoint2);
-	var gridLine = getLine(line);
-
-	if (gridLine != null) {
-		gridLine.highlightOn();
-	};
-};
-
 function resetHighlights() {
 	for (var i = 0; i < GRID_LINES.length; i++) {
 		GRID_LINES[i].highlightOff();
@@ -309,27 +354,15 @@ function resetHighlights() {
 
 function parsePointer(event) {
 	var point = new Point(event.offsetX, event.offsetY);
+	var nearbyLine = getNearbyLine(point);
 
-	if (isPointOnGridLine(point)) {
-		highlightLine(point);
+	if (nearbyLine != null) {
+		nearbyLine.highlightOn();
 		drawGrid();
 	} else {
 		resetHighlights();
 		drawGrid();
 	};
-};
-
-function isPointOnGridLine(point) {
-	// we do not want points on the grid points
-	if (point.X % DISTANCE_BTW_PTS == 0 && point.Y % DISTANCE_BTW_PTS == 0) {
-		return false;
-	};
-
-	if (point.X % DISTANCE_BTW_PTS == 0 || point.Y % DISTANCE_BTW_PTS == 0) {
-		return true;
-	};
-
-	return false;
 };
 
 
