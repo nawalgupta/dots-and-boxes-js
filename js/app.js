@@ -259,7 +259,7 @@ function getGridLine(line) {
 
 // finds the nearest line for a given point if the point is close enough to one
 function getNearbyLine(point) {
-	var buffer = 5;
+	var buffer = 2;
 	var linePoint1;
 	var linePoint2;
 	var line;
