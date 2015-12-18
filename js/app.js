@@ -8,6 +8,8 @@ CONTEXT = null;
 CANVAS_OFFSET = 1;
 
 DISTANCE_BTW_PTS = 50;
+GRID_LINE_BUFFER = 2;
+GRID_BOX_OFFSET = 5;
 
 GRID_POINTS = []
 GRID_LINES = [];
@@ -158,8 +160,21 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 		return false;
 	};
 
-	this.Activate = function() {
+	this.activate = function() {
 		this.Active = true;
+	};
+
+	this.draw = function() {
+		if (this.Active) {
+			var buffer = GRID_BOX_OFFSET;
+			var x = this.PointTopLeft.X + buffer;
+			var y = this.PointTopLeft.Y + buffer;
+			var width = this.PointTopRight.X - this.PointTopLeft.X - buffer*2;
+			var height = this.PointBottomLeft.Y - this.PointTopLeft.Y - buffer*2;
+
+			CONTEXT.fillStyle = "#F0F0F0";
+			CONTEXT.fillRect(x, y, width, height);
+		}
 	};
 };
 
@@ -310,7 +325,7 @@ function getGridLine(line) {
 
 // finds the nearest line for a given point if the point is close enough to one
 function getNearbyLine(point) {
-	var buffer = 2;
+	var buffer = GRID_LINE_BUFFER;
 	var linePoint1;
 	var linePoint2;
 	var line;
@@ -407,6 +422,11 @@ function drawGrid() {
 	// draw active lines
 	for (var i = 0; i < GRID_LINES.length; i++) {
 		GRID_LINES[i].draw();
+	};
+
+	// draw active boxes
+	for (var i = 0; i < GRID_BOXES.length; i++) {
+		GRID_BOXES[i].draw();
 	};
 };
 
