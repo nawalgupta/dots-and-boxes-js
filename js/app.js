@@ -7,9 +7,11 @@ CANVAS = null;
 CONTEXT = null;
 CANVAS_OFFSET = 1;
 
+DISTANCE_BTW_PTS = 50;
+
 GRID_POINTS = []
 GRID_LINES = [];
-DISTANCE_BTW_PTS = 50;
+GRID_BOXES = []
 
 
 /*
@@ -137,6 +139,30 @@ function Line(point1, point2) {
 	};
 };
 
+function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
+	this.PointTopLeft = pointTopLeft;
+	this.PointTopRight = pointTopRight;
+	this.PointBottomLeft = pointBottomLeft;
+	this.PointBottomRight = pointBottomRight;
+	this.Active = false;
+
+	this.equalTo = function(box) {
+		if (this.PointTopLeft.equalTo(box.PointTopLeft) &&
+				this.PointTopRight.equalTo(box.PointTopRight) &&
+				this.PointBottomLeft.equalTo(box.PointBottomLeft) &&
+				this.PointBottomRight.equalTo(box.PointBottomRight)) {
+
+			return true;
+		}
+
+		return false;
+	};
+
+	this.Activate = function() {
+		this.Active = true;
+	};
+};
+
 
 /*
 	SETUP
@@ -146,6 +172,7 @@ function initializeGame() {
 	setupCanvas(550, 550);
 	generateGridPoints();
 	generateGridLines();
+	generateGridBoxes();
 	initializePointer();
 	drawGrid();
 };
@@ -217,6 +244,29 @@ function generateGridLines() {
 	};
 };
 
+function generateGridBoxes() {
+	for (var i = 0; i < GRID_POINTS.length; i++) {
+		// we can assume each point is the top-left of the box
+		var pointTopLeft = GRID_POINTS[i];
+		var pointTopRight = pointTopLeft.pointRight();
+		var pointBottomLeft = pointTopLeft.pointBelow();
+
+		// need to check for null values
+		if (pointTopRight != null) {
+			var pointBottomRight = pointTopRight.pointBelow();
+
+			if (pointBottomLeft != null && pointBottomRight != null) {
+				var box = new Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight);
+
+				if (!doesBoxExist(box)) {
+					GRID_BOXES.push(box);
+				};
+			};
+		};
+		
+	};
+};
+
 function initializePointer() {
 	$("#" + CANVAS_ID).mousemove(function(event) {
 		parsePointerMove(event);
@@ -232,6 +282,7 @@ function initializePointer() {
 	HELPERS
 */
 
+// checks to see if line exists in the grid
 function doesLineExist(line) {
 	for (var i = 0; i < GRID_LINES.length; i++) {
 		var gridLine = GRID_LINES[i];
@@ -321,6 +372,19 @@ function getNearbyLine(point) {
 	}
 
 	return gridLine;
+};
+
+// checks to see if box exists in the grid
+function doesBoxExist(box) {
+	for (var i = 0; i < GRID_BOXES.length; i++) {
+		var gridBox = GRID_BOXES[i];
+
+		if (box.equalTo(gridBox)) {
+			return true;
+		};
+	};
+
+	return false;
 };
 
 
