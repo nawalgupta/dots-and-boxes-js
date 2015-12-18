@@ -143,7 +143,7 @@ function Line(point1, point2) {
 */
 
 function initializeGame() {
-	setupCanvas(600, 600);
+	setupCanvas(550, 550);
 	generateGridPoints();
 	generateGridLines();
 	initializePointer();
