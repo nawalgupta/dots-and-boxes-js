@@ -190,8 +190,8 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 
 function initializeGame(boardSize) {
 	var boardWidth = calculateBoardSize(boardSize);
+	
 	setupCanvas(boardWidth, boardWidth);
-
 	initializeGlobalVariables();
 	generateGridPoints();
 	generateGridLines();
@@ -201,7 +201,7 @@ function initializeGame(boardSize) {
 };
 
 function calculateBoardSize(boardSize) {
-	return boardSize*DISTANCE_BTW_PTS+2;
+	return boardSize * DISTANCE_BTW_PTS + 2;
 };
 
 function initializeGlobalVariables() {
