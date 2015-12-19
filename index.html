@@ -18,9 +18,34 @@
   </head>
   <body>
     <div class="container">
+
       <h1 class="text-center">Dots & Boxes</h1>
 
-      <canvas id="gameCanvas" class="center-block" style="cursor:pointer;"></canvas>
+      <div class="row">
+        <div class="col-md-3 text-center">
+          <h3>Board Size</h3>
+
+          <div class="btn-group-vertical" data-toggle="buttons">
+            <label class="btn btn-primary" id="button-size-10" onclick="selectBoardSize(10);">
+              <input type="checkbox" autocomplete="off"> 10 x 10
+            </label>
+            <label class="btn btn-primary" id="button-size-6" onclick="selectBoardSize(6);">
+              <input type="checkbox" autocomplete="off"> 8 x 8
+            </label>
+            <label class="btn btn-primary" id="button-size-4" onclick="selectBoardSize(4);">
+              <input type="checkbox" autocomplete="off"> 4 x 4
+            </label>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <canvas id="gameCanvas" class="center-block" style="cursor:pointer;"></canvas>
+        </div>
+
+        <div class="col-md-3">
+          <h3>Players</h3>
+        </div>
+      </div>
 
     </div> <!-- END container -->
 

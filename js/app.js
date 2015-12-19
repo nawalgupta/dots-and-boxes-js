@@ -15,6 +15,8 @@ GRID_POINTS = []
 GRID_LINES = [];
 GRID_BOXES = []
 
+SIZE_SELECTION_BUTTON_IDS = ["button-size-4", "button-size-6", "button-size-10"];
+
 
 /*
 	OBJECTS
@@ -186,8 +188,11 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 	SETUP
 */
 
-function initializeGame() {
-	setupCanvas(550, 550);
+function initializeGame(boardSize) {
+	var boardWidth = boardSize*DISTANCE_BTW_PTS+DISTANCE_BTW_PTS/boardSize;
+	var boardHeight = boardSize*DISTANCE_BTW_PTS+DISTANCE_BTW_PTS/boardSize;
+
+	setupCanvas(boardWidth, boardHeight);
 	generateGridPoints();
 	generateGridLines();
 	generateGridBoxes();
@@ -283,6 +288,19 @@ function initializePointer() {
 	$("#" + CANVAS_ID).click(function(event) {
 		parsePointerClick(event);
 	});
+};
+
+// this function is controlled by the buttons in the HTML
+function selectBoardSize(size) {
+	resetBoardSizeButtons();
+	$("#button-size-" + size).addClass("active");
+	initializeGame(size);
+};
+
+function resetBoardSizeButtons() {
+	for (var i = 0; i < SIZE_SELECTION_BUTTON_IDS.length; i++) {
+		$("#" + SIZE_SELECTION_BUTTON_IDS[i]).removeClass("active");
+	};
 };
 
 
@@ -576,6 +594,6 @@ function parsePointerClick(event) {
 	DRIVER CODE
 */
 
-initializeGame();
+initializeGame(10);
 
 
