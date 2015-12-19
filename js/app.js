@@ -11,9 +11,9 @@ DISTANCE_BTW_PTS = 50;
 GRID_LINE_BUFFER = 2;
 GRID_BOX_OFFSET = 5;
 
-GRID_POINTS = []
+GRID_POINTS = [];
 GRID_LINES = [];
-GRID_BOXES = []
+GRID_BOXES = [];
 
 SIZE_SELECTION_BUTTON_IDS = ["button-size-4", "button-size-6", "button-size-10"];
 
@@ -189,15 +189,25 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 */
 
 function initializeGame(boardSize) {
-	var boardWidth = boardSize*DISTANCE_BTW_PTS+DISTANCE_BTW_PTS/boardSize;
-	var boardHeight = boardSize*DISTANCE_BTW_PTS+DISTANCE_BTW_PTS/boardSize;
+	var boardWidth = calculateBoardSize(boardSize);
+	setupCanvas(boardWidth, boardWidth);
 
-	setupCanvas(boardWidth, boardHeight);
+	initializeGlobalVariables();
 	generateGridPoints();
 	generateGridLines();
 	generateGridBoxes();
 	initializePointer();
 	drawGrid();
+};
+
+function calculateBoardSize(boardSize) {
+	return boardSize*DISTANCE_BTW_PTS+2;
+};
+
+function initializeGlobalVariables() {
+	GRID_POINTS = [];
+	GRID_LINES = [];
+	GRID_BOXES = [];
 };
 
 function setupCanvas(width, height) {
