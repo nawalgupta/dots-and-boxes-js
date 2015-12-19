@@ -263,24 +263,14 @@ function generateGridLines() {
 
 function generateGridBoxes() {
 	for (var i = 0; i < GRID_POINTS.length; i++) {
-		// we can assume each point is the top-left of the box
 		var pointTopLeft = GRID_POINTS[i];
-		var pointTopRight = pointTopLeft.pointRight();
-		var pointBottomLeft = pointTopLeft.pointAbove();
+		var box = getBoxByTopLeftPoint(pointTopLeft);
 
-		// need to check for null values
-		if (pointTopRight != null) {
-			var pointBottomRight = pointTopRight.pointAbove();
-
-			if (pointBottomLeft != null && pointBottomRight != null) {
-				var box = new Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight);
-
-				if (!doesBoxExist(box)) {
-					GRID_BOXES.push(box);
-				};
-			};
+		if (box != null) {
+			if (!doesBoxExist(box)) {
+				GRID_BOXES.push(box);
+			}
 		};
-		
 	};
 };
 
@@ -393,6 +383,10 @@ function getNearbyLine(point) {
 
 // checks to see if box exists in the grid
 function doesBoxExist(box) {
+	if (box == null) {
+		return null;
+	}
+
 	for (var i = 0; i < GRID_BOXES.length; i++) {
 		var gridBox = GRID_BOXES[i];
 
@@ -402,6 +396,101 @@ function doesBoxExist(box) {
 	};
 
 	return false;
+};
+
+function getGridBox(box) {
+	for (var i = 0; i < GRID_BOXES.length; i++) {
+		var gridBox = GRID_BOXES[i];
+
+		if (box.equalTo(gridBox)) {
+			return gridBox;
+		}
+	};
+
+	return null;
+};
+
+function getBoxByTopLeftPoint(pointTopLeft) {
+	var box = null;
+
+	if (pointTopLeft == null) {
+		return null;
+	};
+
+	var pointTopRight = pointTopLeft.pointRight();
+	var pointBottomLeft = pointTopLeft.pointAbove();
+
+	// need to check for null values
+	if (pointTopRight != null) {
+		var pointBottomRight = pointTopRight.pointAbove();
+
+		if (pointBottomLeft != null && pointBottomRight != null) {
+			box = new Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight);
+		};
+	};
+
+	return box;
+};
+
+function getBoxesByLine(line) {
+	var boxes = [];
+
+	// a line can be part of up to two boxes
+	var pointTopLeft1;
+	var pointTopLeft2;
+
+	// line is horizontal
+	if (line.Point1.Y == line.Point2.Y) {
+		if (line.Point1.X < line.Point2.X) {
+			pointTopLeft1 = line.Point1.pointBelow();
+			pointTopLeft2 = line.Point1;
+		} else {
+			pointTopLeft1 = line.Point2.pointBelow();
+			pointTopLeft2 = line.Point2;
+		};
+	};
+
+	// line is vertical
+	if (line.Point1.X == line.Point2.X) {
+		if (line.Point1.Y < line.Point2.Y) {
+			pointTopLeft1 = line.Point1.pointLeft();
+			pointTopLeft2 = line.Point1;
+		} else {
+			pointTopLeft1 = line.Point2.pointLeft();
+			pointTopLeft2 = line.Point2;
+		};
+	};
+
+	var box1 = getBoxByTopLeftPoint(pointTopLeft1);
+	var box2 = getBoxByTopLeftPoint(pointTopLeft2);
+
+	if (doesBoxExist(box1)) {
+		boxes.push(box1);
+	};
+
+	if (doesBoxExist(box2)) {
+		boxes.push(box2);
+	};
+
+	return boxes;
+};
+
+function isBoxComplete(box) {
+	return true;
+};
+
+// check to see if an activated line has closed a box
+function updateBoxStatus(line) {
+	var boxes = getBoxesByLine(line);
+	
+	for (var i = 0; i < boxes.length; i++) {
+		var box = boxes[i];
+
+		if (isBoxComplete(box)) {
+			var completeBox = getGridBox(box);
+			completeBox.activate();
+		};
+	};
 };
 
 
@@ -462,6 +551,7 @@ function parsePointerClick(event) {
 
 	if (nearbyLine != null) {
 		nearbyLine.activate();
+		updateBoxStatus(nearbyLine);
 		drawGrid();
 	};
 };
