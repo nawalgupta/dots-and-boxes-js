@@ -88,6 +88,7 @@ function Point(x, y) {
 
 	this.draw = function() {
 		CONTEXT.beginPath();
+		CONTEXT.fillStyle = "#000000";
 		CONTEXT.arc(this.X, this.Y, 2, 0, 2 * Math.PI, true);
 		CONTEXT.fill();
 	};
