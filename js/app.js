@@ -476,7 +476,20 @@ function getBoxesByLine(line) {
 };
 
 function isBoxComplete(box) {
-	return true;
+	var topLine = new Line(box.PointTopLeft, box.PointTopRight);
+	var bottomLine = new Line(box.PointBottomLeft, box.PointBottomRight);
+	var leftLine = new Line(box.PointTopLeft, box.PointBottomLeft);
+	var rightLine = new Line(box.PointTopRight, box.PointBottomRight);
+
+	if (getGridLine(topLine).Active &&
+			getGridLine(bottomLine).Active &&
+			getGridLine(leftLine).Active &&
+			getGridLine(rightLine).Active) {
+
+		return true;
+	};
+
+	return false;
 };
 
 // check to see if an activated line has closed a box
