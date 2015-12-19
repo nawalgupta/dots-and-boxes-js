@@ -551,6 +551,7 @@ function parsePointerMove(event) {
 	var nearbyLine = getNearbyLine(point);
 
 	if (nearbyLine != null) {
+		resetHighlights();
 		nearbyLine.highlightOn();
 		drawGrid();
 	} else {
