@@ -190,7 +190,7 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 
 function initializeGame(boardSize) {
 	var boardWidth = calculateBoardSize(boardSize);
-	
+
 	setupCanvas(boardWidth, boardWidth);
 	initializeGlobalVariables();
 	generateGridPoints();
@@ -303,7 +303,6 @@ function initializePointer() {
 // this function is controlled by the buttons in the HTML
 function selectBoardSize(size) {
 	resetBoardSizeButtons();
-	$("#button-size-" + size).addClass("active");
 	initializeGame(size);
 };
 
