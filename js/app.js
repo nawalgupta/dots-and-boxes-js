@@ -28,13 +28,15 @@ function Point(x, y) {
 		for (var i = 0; i < GRID_POINTS.length; i++) {
 			var gridPoint = GRID_POINTS[i];
 
-			if (gridPoint.X === this.X && gridPoint.Y === this.Y) {
+			if (gridPoint.X == this.X && gridPoint.Y == this.Y) {
 				return true;
 			};
 		};
 
 		return false;
 	};
+
+	// NOTE: Remeber that on a canvas, the origin is the top-left!!!
 
 	this.pointAbove = function() {
 		var point = new Point(this.X, this.Y + DISTANCE_BTW_PTS);
@@ -264,11 +266,11 @@ function generateGridBoxes() {
 		// we can assume each point is the top-left of the box
 		var pointTopLeft = GRID_POINTS[i];
 		var pointTopRight = pointTopLeft.pointRight();
-		var pointBottomLeft = pointTopLeft.pointBelow();
+		var pointBottomLeft = pointTopLeft.pointAbove();
 
 		// need to check for null values
 		if (pointTopRight != null) {
-			var pointBottomRight = pointTopRight.pointBelow();
+			var pointBottomRight = pointTopRight.pointAbove();
 
 			if (pointBottomLeft != null && pointBottomRight != null) {
 				var box = new Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight);
