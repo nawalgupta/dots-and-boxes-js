@@ -19,14 +19,16 @@ SIZE_SELECTION_BUTTON_IDS = ["button-size-4", "button-size-6", "button-size-10"]
 
 PLAYERS = [];
 CURRENT_PLAYER = 1;
+PLAYER_COLORS = ["#4169E1", "#2E8B57"];
 
 
 /*
 	OBJECTS
 */
 
-function Player(id) {
+function Player(id, color) {
 	this.Id = id;
+	this.Color = color;
 };
 
 function Point(x, y) {
@@ -186,7 +188,7 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 			var width = this.PointTopRight.X - this.PointTopLeft.X - buffer*2;
 			var height = this.PointBottomLeft.Y - this.PointTopLeft.Y - buffer*2;
 
-			CONTEXT.fillStyle = "#F0F0F0";
+			CONTEXT.fillStyle = this.Player.Color;
 			CONTEXT.fillRect(x, y, width, height);
 		}
 	};
@@ -326,7 +328,7 @@ function resetBoardSizeButtons() {
 
 function generatePlayers(numberPlayers) {
 	for (var i = 1; i <= numberPlayers; i++) {
-		PLAYERS.push(new Player(i));
+		PLAYERS.push(new Player(i, PLAYER_COLORS[i-1]));
 	};
 };
 
