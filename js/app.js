@@ -328,7 +328,9 @@ function resetBoardSizeButtons() {
 
 function generatePlayers(numberPlayers) {
 	for (var i = 1; i <= numberPlayers; i++) {
-		PLAYERS.push(new Player(i, PLAYER_COLORS[i-1]));
+		var player = new Player(i, PLAYER_COLORS[i-1]);
+		PLAYERS.push(player);
+		$("#players").append("<p style='background:" + player.Color + "'>Player " + player.Id + "</p>");
 	};
 };
 
