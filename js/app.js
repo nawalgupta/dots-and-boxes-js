@@ -18,6 +18,7 @@ GRID_BOXES = [];
 SIZE_SELECTION_BUTTON_IDS = ["button-size-4", "button-size-6", "button-size-10"];
 
 PLAYERS = [];
+CURRENT_PLAYER = 1;
 
 
 /*
@@ -26,11 +27,6 @@ PLAYERS = [];
 
 function Player(id) {
 	this.Id = id;
-	this.Boxes = [];
-	
-	this.closedBox = function(box) {
-		this.Boxes.push(box);
-	};
 };
 
 function Point(x, y) {
@@ -163,6 +159,7 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 	this.PointBottomLeft = pointBottomLeft;
 	this.PointBottomRight = pointBottomRight;
 	this.Active = false;
+	this.Player;
 
 	this.equalTo = function(box) {
 		if (this.PointTopLeft.equalTo(box.PointTopLeft) &&
@@ -176,8 +173,9 @@ function Box(pointTopLeft, pointTopRight, pointBottomLeft, pointBottomRight) {
 		return false;
 	};
 
-	this.activate = function() {
+	this.activate = function(player) {
 		this.Active = true;
+		this.Player = player;
 	};
 
 	this.draw = function() {
@@ -220,6 +218,8 @@ function initializeGlobalVariables() {
 	GRID_POINTS = [];
 	GRID_LINES = [];
 	GRID_BOXES = [];
+	PLAYERS = [];
+	CURRENT_PLAYER = 1;
 };
 
 function setupCanvas(width, height) {
@@ -547,7 +547,17 @@ function updateBoxStatus(line) {
 
 		if (isBoxComplete(box)) {
 			var completeBox = getGridBox(box);
-			completeBox.activate();
+			completeBox.activate(getCurrentPlayer());
+		};
+	};
+};
+
+function getCurrentPlayer() {
+	for (var i = 0; i < PLAYERS.length; i++) {
+		var player = PLAYERS[i];
+
+		if (player.Id == CURRENT_PLAYER) {
+			return player;
 		};
 	};
 };
@@ -612,7 +622,16 @@ function parsePointerClick(event) {
 	if (nearbyLine != null) {
 		nearbyLine.activate();
 		updateBoxStatus(nearbyLine);
+		activateNextPlayer();
 		drawGrid();
+	};
+};
+
+function activateNextPlayer() {
+	CURRENT_PLAYER++;
+
+	if (CURRENT_PLAYER > PLAYERS.length) {
+		CURRENT_PLAYER = 1;
 	};
 };
 
