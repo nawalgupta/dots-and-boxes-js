@@ -17,10 +17,21 @@ GRID_BOXES = [];
 
 SIZE_SELECTION_BUTTON_IDS = ["button-size-4", "button-size-6", "button-size-10"];
 
+PLAYERS = [];
+
 
 /*
 	OBJECTS
 */
+
+function Player(id) {
+	this.Id = id;
+	this.Boxes = [];
+	
+	this.closedBox = function(box) {
+		this.Boxes.push(box);
+	};
+};
 
 function Point(x, y) {
 	this.X = x;
@@ -196,6 +207,7 @@ function initializeGame(boardSize) {
 	generateGridPoints();
 	generateGridLines();
 	generateGridBoxes();
+	generatePlayers(2);
 	initializePointer();
 	drawGrid();
 };
@@ -309,6 +321,12 @@ function selectBoardSize(size) {
 function resetBoardSizeButtons() {
 	for (var i = 0; i < SIZE_SELECTION_BUTTON_IDS.length; i++) {
 		$("#" + SIZE_SELECTION_BUTTON_IDS[i]).removeClass("active");
+	};
+};
+
+function generatePlayers(numberPlayers) {
+	for (var i = 1; i <= numberPlayers; i++) {
+		PLAYERS.push(new Player(i));
 	};
 };
 
