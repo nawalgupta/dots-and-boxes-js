@@ -19,7 +19,7 @@ SIZE_SELECTION_BUTTON_IDS = ["button-size-4", "button-size-6", "button-size-10"]
 
 PLAYERS = [];
 CURRENT_PLAYER = 1;
-PLAYER_COLORS = ["#4169E1", "#2E8B57"];
+PLAYER_COLORS = ["#B0C4DE", "#F0E68C"];
 
 
 /*
